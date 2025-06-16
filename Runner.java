@@ -1,57 +1,48 @@
- class Marks {
-    // Encapsulated data members
-    private int mark1;
-    private int mark2;
-    private int mark3;
-
-    public Marks(int x, int y, int z){
-            mark1=x;
-            mark2=y;
-            mark3=z;
+class person {
+    protected String name ; protected String id ; protected int phone ;
+    public person() {
+        name = "NaginaNazar" ; id = "sp14bcs039" ; phone = 12345 ;
     }
-    //set
-    public void setMark1(int x) {
-        mark1 = x;
-    }
-
-    public void setMark2(int y) {
-        mark2 = y;
-    }
-
-    public void setMark3(int z) {
-        mark3 = z;
-    }
-
-    // Get
-    public int getMark1() {
-        return mark1;
-    }
-
-    public int getMark2() {
-        return mark2;
-    }
-
-    public int getMark3() {
-        return mark3;
-    }
-    public void display(){
-        System.out.println("mark: " +mark1+ ","+mark2+","+mark3);
+    public person(String a , String b , int c)
+    { name = a ; id = b ; phone = c ;}
+    public void setName(String a){ name = a ;}
+    public void setId(String j){id = j ;}
+    public void setPhone(int a) { phone = a ;}
+    public String getName() {return name ;}
+    public String getid() {return id ;}
+    public int getPhone() {return phone ;}
+    public void display( )
+    {
+        System.out.println("Name : " + name + "ID : " + id + "Phone : " + phone );
     }
 }
 
-public class Runner {
-    public static void main(String[] args) {
-//setting
-        Marks s1 = new Marks(45,56,89);
-        s1.display();
-        s1.setMark1(85);
-        s1.setMark2(90);
-        s1.setMark3(78);
-
-        // Getting and displaying
-        System.out.println("Marks obtained:");
-        System.out.println("Mark 1: " + s1.getMark1());
-        System.out.println("Mark 2: " + s1.getMark2());
-        System.out.println("Mark 3: " + s1.getMark3());
+ class student extends person {
+    private String rollNo;
+    private int marks ;
+    public student() {
+        super() ;
+        rollNo = "sp14bcs039" ; marks = 345 ;
+    }
+    public student(String a , String b , int c , String d , int e)
+    { super(a,b,c) ;
+        rollNo = d ; marks = e ;
+    }
+    public void setRollNo(String a){ rollNo = a ;}
+    public void setMarks(int a ){ marks = a ;}
+    public String getRollNo() { return rollNo ;}
+    public int getMarks() {return marks ;}
+    public void display( )
+    {
+        super.display();
+        System.out.println("Roll # : " + rollNo + "\nMarks : " + marks) ;
+    }
+}
+public class Runner
+{
+    public static void main(String []args)
+    {
+        student s = new student ("Yaseen", "s-09", 123, "sp24-bsse-070",90);
+        s.display();
     }
 }
