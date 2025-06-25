@@ -1,79 +1,108 @@
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
 
-class ShipmentForm {
 
-    private JFrame frame;
-    private JComboBox<String> supplierCombo, customerCombo, productCombo;
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.input.MouseButton;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new ShipmentForm().createGUI());
+class SeaBattle extends Application {
+    private static final String JOB4J = "Морской бой www.job4j.ru";
+    private final int size = 10;
+    private final Logic logic = new Logic();
+
+    private Rectangle buildRectangle(int x, int y, int size) {
+        Rectangle rect = new Rectangle();
+        rect.setX(x * size);
+        rect.setY(y * size);
+        rect.setHeight(size);
+        rect.setWidth(size);
+        rect.setFill(Color.WHITE);
+        rect.setStroke(Color.BLACK);
+        return rect;
     }
 
-    private void createGUI() {
-        frame = new JFrame(" Shipment Entry");
-        frame.setSize(500, 300);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
-        frame.setLayout(new BorderLayout());
-
-        JLabel title = new JLabel("Shipment Entry Form ", JLabel.CENTER);
-        title.setFont(new Font("Segue UI", Font.BOLD, 20));
-        title.setBorder(BorderFactory.createEmptyBorder(20, 0, 10, 0));
-        frame.add(title, BorderLayout.NORTH);
-
-        JPanel panel = new JPanel(new GridLayout(4, 2, 15, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 40, 10, 40));
-
-        // Hardcoded sample data
-        String[] suppliers = {"1 - Supplier x", "2 - Supplier y", "3 - Supplier z"};
-        String[] customers = {"1 -  Ali", "2 - Haider", "3 -  Noor", "4 - iqbal", "5 - Abbas"};
-        String[] products = {"1 - AK47", "2 - M416", "3 - KR98", "4 - rocket", "5 - hand grenade"};
-
-        supplierCombo = new JComboBox<>(suppliers);
-        customerCombo = new JComboBox<>(customers);
-        productCombo = new JComboBox<>(products);
-
-        panel.add(new JLabel("Supplier:"));
-        panel.add(supplierCombo);
-        panel.add(new JLabel("Customer:"));
-        panel.add(customerCombo);
-        panel.add(new JLabel("Product:"));
-        panel.add(productCombo);
-
-        frame.add(panel, BorderLayout.CENTER);
-
-        JButton submitBtn = new JButton("Submit Shipment");
-        submitBtn.setFont(new Font("Segue UI", Font.BOLD, 14));
-        submitBtn.setBackground(new Color(0xEF323A));
-        submitBtn.setForeground(Color.WHITE);
-        submitBtn.setFocusPainted(false);
-
-        submitBtn.addActionListener(this::simulateInsert);
-
-        JPanel btnPanel = new JPanel();
-        btnPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
-        btnPanel.add(submitBtn);
-        frame.add(btnPanel, BorderLayout.SOUTH);
-
-        frame.setVisible(true);
+    private Group buildGrid() {
+        Group panel = new Group();
+        for (int y = 0; y != this.size; y++) {
+            for (int x = 0; x != this.size; x++) {
+                panel.getChildren().add(this.buildRectangle(x, y, 25));
+            }
+        }
+        return panel;
     }
 
-    private void simulateInsert(ActionEvent e) {
-        String supplier = (String) supplierCombo.getSelectedItem();
-        String customer = (String) customerCombo.getSelectedItem();
-        String product = (String) productCombo.getSelectedItem();
+    @Override
+    public void start(Stage stage) {
+        BorderPane border = new BorderPane();
+        HBox control = new HBox();
+        control.setPrefHeight(40F);
+        control.setSpacing(10F);
+        control.setAlignment(Pos.BASELINE_CENTER);
+        Button start = new Button("Начать");
+        HBox center = new HBox();
+        center.setPadding(new Insets(15, 12, 15, 12));
+        center.setSpacing(10.0);
+        center.setAlignment(Pos.BASELINE_CENTER);
+        border.setCenter(center);
+        border.setBottom(control);
+        Group board = this.buildGrid();
+        center.getChildren().add(board);
+        center.getChildren().add(this.buildGrid());
+        control.getChildren().addAll(start);
+        border.setBottom(control);
+        stage.setScene(new Scene(border, 600, 300));
+        stage.setTitle(JOB4J);
+        stage.setResizable(false);
+        stage.show();
+        this.buildShip(board, 4, 0, 0);
+        this.buildShip(board, 3, 0, 50);
+        this.buildShip(board, 3, 0, 100);
+        this.buildShip(board, 2, 0, 150);
+        this.buildShip(board, 2, 0, 200);
+        this.buildShip(board, 2, 200, 0);
+        this.buildShip(board, 1, 200, 50);
+        this.buildShip(board, 1, 200, 100);
+        this.buildShip(board, 1, 200, 150);
+        this.buildShip(board, 1, 200, 200);
+    }
 
-        JOptionPane.showMessageDialog(frame,
-                "Simulated Shipment Submitted:\n\n" +
-                        "Supplier: " + supplier + "\n" +
-                        "Customer: " + customer + "\n" +
-                        "Product: " + product,
-                "Order Successfully submitted",
-                JOptionPane.INFORMATION_MESSAGE);
+    private void buildShip(Group board, int desk, int startX, int startY) {
+        Rectangle rect = new Rectangle();
+        rect.setX(startX);
+        rect.setY(startY);
+        rect.setHeight(25);
+        rect.setWidth(desk * 25);
+        rect.setFill(Color.BLACK);
+        rect.setOnMouseDragged(
+                event -> {
+                    rect.setX(event.getX());
+                    rect.setY(event.getY());
+                }
+        );
+        rect.setOnMouseReleased(
+                event -> {
+                    rect.setX((((int) event.getX() / 25) * 25));
+                    rect.setY(((int) event.getY() / 25) * 25);
+                }
+        );
+        rect.setOnMouseClicked(
+                event -> {
+                    if (event.getButton() != MouseButton.PRIMARY) {
+                        Rectangle momento = new Rectangle(rect.getX(),
+                                rect.getY(), rect.getWidth(), rect.getHeight());
+                        rect.setWidth(momento.getHeight());
+                        rect.setHeight(momento.getWidth());
+                    }
+                }
+        );
+        board.getChildren().add(rect);
     }
 }
-
-
-//use array in combo box(for the increment every time  in customer and get products on deadline via shipment
