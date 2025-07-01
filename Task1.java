@@ -1,105 +1,45 @@
+import java.util.Scanner;
 
-class Person {
-    protected String name, address, phone, email;
-
-    Person(String name, String address, String phone, String email) {
-        this.name = name;
-        this.address = address;
-        this.phone = phone;
-        this.email = email;
-    }
-
-    void display() {
-        System.out.println("\n--- Person Details ---");
-        System.out.println("Name: " + name);
-        System.out.println("Address: " + address);
-        System.out.println("Phone: " + phone);
-        System.out.println("Email: " + email);
-    }
-}
-
-
-class Student extends Person {
-    String status;
-
-    Student(String name, String address, String phone, String email, String status) {
-        super(name, address, phone, email);
-        this.status = status;
-    }
-
-    void display() {
-        super.display();
-        System.out.println("Status: " + status);
-    }
-}
-
-
-class Employee extends Person {
-    String office;
-    double salary;
-    String dateHired;
-
-    Employee(String name, String address, String phone, String email, String office, double salary, String dateHired) {
-        super(name, address, phone, email);
-        this.office = office;
-        this.salary = salary;
-        this.dateHired = dateHired;
-    }
-
-    void display() {
-        super.display();
-        System.out.println("Office: " + office);
-        System.out.println("Salary: $" + salary);
-        System.out.println("Date Hired: " + dateHired);
-    }
-}
-
-class Faculty extends Employee {
-    String officeHours, rank;
-
-    Faculty(String name, String address, String phone, String email, String office, double salary, String dateHired, String officeHours, String rank) {
-        super(name, address, phone, email, office, salary, dateHired);
-        this.officeHours = officeHours;
-        this.rank = rank;
-    }
-
-    void display() {
-        super.display();
-        System.out.println("Office Hours: " + officeHours);
-        System.out.println("Rank: " + rank);
-    }
-}
-
-// Subclass: Staff (inherits from Employee)
-class Staff extends Employee {
-    String title;
-
-    Staff(String name, String address, String phone, String email, String office, double salary, String dateHired, String title) {
-        super(name, address, phone, email, office, salary, dateHired);
-        this.title = title;
-    }
-
-    void display() {
-        super.display();
-        System.out.println("Title: " + title);
-    }
-}
-
-
-public class Task1 {
+public class Task1
+ {
     public static void main(String[] args) {
+        Scanner yh = new Scanner(System.in);
 
-        Person person = new Person("Yaseen", "123 Street", "123-456", "yaseen@example.com");
-        Student student = new Student("Haider", "456 Avenue", "987-654", "haider@example.com", "Sophomore");
-        Employee employee = new Employee("Mine", "789 Lane", "555-555", "mine@example.com", "Office 101", 50000, "March 17, 2025");
-        Faculty faculty = new Faculty("Dr. Abid", "101 Road", "111-222", "abid@example.com", "Office 202", 80000, "March 17, 2025", "9 AM - 5 PM", "Professor");
-        Staff staff = new Staff("Karen", "789 Street", "444-444", "karen@example.com", "Office 303", 40000, "March 17, 2025", "HR Manager");
+        // Prompt user for the first point's latitude and longitude
+        System.out.print("Enter the latitude of the first point (in degrees): ");
+        double latitude1 = yh.nextDouble();
+        System.out.print("Enter the longitude of the first point (in degrees): ");
+        double longitude1 = yh.nextDouble();
 
+        // Prompt user for the second point's latitude and longitude
+        System.out.print("Enter the latitude of the second point (in degrees): ");
+        double latitude2 = yh.nextDouble();
+        System.out.print("Enter the longitude of the second point (in degrees): ");
+        double longitude2 = yh.nextDouble();
 
-        person.display();
-        student.display();
-        employee.display();
-        faculty.display();
-        staff.display();
+        // Convert degrees to radians
+        double lat1Rad = Math.toRadians(latitude1);
+        double lon1Rad = Math.toRadians(longitude1);
+        double lat2Rad = Math.toRadians(latitude2);
+        double lon2Rad = Math.toRadians(longitude2);
+
+        // Haversine formula
+        final int EARTH_RADIUS = 6371; // Average radius of Earth in kilometers
+
+        double dLat = lat2Rad - lat1Rad;
+        double dLon = lon2Rad - lon1Rad;
+
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                   Math.cos(lat1Rad) * Math.cos(lat2Rad) *
+                   Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        double distance = EARTH_RADIUS * c; // Distance in kilometers
+
+        // Display the result
+        System.out.printf("The great circle distance between the two points is: %.2f km%n", distance);
+
+        // Close the scanner
+        scanner.close();
     }
 }
