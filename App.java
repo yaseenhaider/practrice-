@@ -4,117 +4,120 @@ import javax.swing.*;
 
 public class App extends JPanel implements ActionListener, KeyListener {
 
-    private int birdY = 250; // Bird's Y position
-    private int birdVelocity = 0; // Bird's velocity
-    private final int GRAVITY = 1; // Gravity applied to the bird
-    private final int FLAP_STRENGTH = -15; // Flap strength when key is pressed
-    private boolean isFlapping = false; // Flag to check if the bird is flapping
-    private Timer timer;
-    private int score = 0; // Player score
+    private int bikeX, bikeY;
+    private final int bikeWidth = 40, bikeHeight = 60;
+    private final int obstacleWidth = 50, obstacleHeight = 50;
+    private int obstacleX, obstacleY;
+    private int score = 0;
+    private boolean gameOver = false;
+
+    // Timer for game loop
+    private Timer gameTimer;
 
     public App() {
-        setPreferredSize(new Dimension(400, 600));
-        setBackground(Color.cyan);
+        // Initial positions
+        bikeX = 100;
+        bikeY = 300;
+
+        obstacleX = 300;
+        obstacleY = 100;
+
+        // Set up the game panel
+        setPreferredSize(new Dimension(800, 600));
+        setBackground(Color.WHITE);
         addKeyListener(this);
         setFocusable(true);
 
-        timer = new Timer(20, this); // Timer to refresh the screen every 20ms
-        timer.start();
+        // Start the game loop
+        gameTimer = new Timer(20, this); // 50 FPS
+        gameTimer.start();
     }
 
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // Draw bird
-        g.setColor(Color.red);
-        g.fillRect(50, birdY, 20, 20); // Draw the bird as a rectangle
-
-        // Draw ground
-        g.setColor(Color.green);
-        g.fillRect(0, getHeight() - 50, getWidth(), 50);
-
-        // Draw score
-        g.setColor(Color.black);
-        g.setFont(new Font("Arial", Font.PLAIN, 24));
-        g.drawString("Score: " + score, 20, 30);
-
-        // Check for game over
-        if (birdY >= getHeight() - 50 || birdY < 0) {
-            gameOver(g);
+        if (gameOver) {
+            g.setColor(Color.RED);
+            g.setFont(new Font("Arial", Font.BOLD, 50));
+            g.drawString("Game Over!", 250, 250);
+            g.setFont(new Font("Arial", Font.PLAIN, 30));
+            g.drawString("Score: " + score, 330, 300);
+            return;
         }
+
+        // Draw the bike (a simple rectangle for now)
+        g.setColor(Color.BLUE);
+        g.fillRect(bikeX, bikeY, bikeWidth, bikeHeight);
+
+        // Draw the obstacle
+        g.setColor(Color.RED);
+        g.fillRect(obstacleX, obstacleY, obstacleWidth, obstacleHeight);
+
+        // Draw the score
+        g.setColor(Color.BLACK);
+        g.setFont(new Font("Arial", Font.PLAIN, 20));
+        g.drawString("Score: " + score, 20, 30);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        // Update bird position
-        if (isFlapping) {
-            birdVelocity = FLAP_STRENGTH; // Apply flap
-            isFlapping = false;
-        } else {
-            birdVelocity += GRAVITY; // Apply gravity
+        if (gameOver) return;
+
+        // Move the obstacle down
+        obstacleY += 5;
+        if (obstacleY > getHeight()) {
+            obstacleY = -obstacleHeight;
+            obstacleX = (int) (Math.random() * (getWidth() - obstacleWidth)); // Random new position
+            score++;
         }
 
-        birdY += birdVelocity;
+        // Check for collision
+        Rectangle bikeRect = new Rectangle(bikeX, bikeY, bikeWidth, bikeHeight);
+        Rectangle obstacleRect = new Rectangle(obstacleX, obstacleY, obstacleWidth, obstacleHeight);
 
-        // Increase score over time (simulating distance traveled)
-        score++;
+        if (bikeRect.intersects(obstacleRect)) {
+            gameOver = true;
+        }
 
-        // Repaint the screen
+        // Repaint the panel to update the game state
         repaint();
     }
 
     @Override
+    public void keyTyped(KeyEvent e) {}
+    @Override
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-            isFlapping = true; // Bird flaps when the space key is pressed
+        if (gameOver) return;
+
+        // Control the bike using arrow keys
+        if (e.getKeyCode() == KeyEvent.VK_UP) {
+            bikeY -= 10;
         }
-    }
+        if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+            bikeY += 10;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+            bikeX -= 10;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+            bikeX += 10;
+        }
 
+        // Prevent the bike from going out of bounds
+        bikeX = Math.max(0, Math.min(getWidth() - bikeWidth, bikeX));
+        bikeY = Math.max(0, Math.min(getHeight() - bikeHeight, bikeY));
+    }
     @Override
-    public void keyReleased(KeyEvent e) {
-        // Not needed for this simple game
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
-        // Not needed for this simple game
-    }
-
-    private void gameOver(Graphics g) {
-        // Display Game Over message
-        g.setColor(Color.red);
-        g.setFont(new Font("Arial", Font.BOLD, 40));
-        g.drawString("Game Over", 100, 250);
-        g.setFont(new Font("Arial", Font.PLAIN, 24));
-        g.drawString("Press R to Restart", 120, 300);
-    }
+    public void keyReleased(KeyEvent e) {}
 
     public static void main(String[] args) {
-        JFrame frame = new JFrame("Bird Fly Game");
+        // Create the game window and add the game panel
+        JFrame frame = new JFrame("Bike Racing Game");
         App gamePanel = new App();
-
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(gamePanel);
         frame.pack();
         frame.setVisible(true);
-
-        // Listen for key events to restart the game
-        gamePanel.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_R) {
-                    gamePanel.resetGame(); // Restart the game when 'R' is pressed
-                }
-            }
-        });
-    }
-
-    // Reset the game after game over
-    private void resetGame() {
-        birdY = 250;
-        birdVelocity = 0;
-        score = 0;
-        repaint();
     }
 }
